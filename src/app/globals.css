@@ -1,8 +1,23 @@
 @import "tailwindcss";
+@import "react-loading-skeleton/dist/skeleton.css";
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1a1f2b;
+  --muted: #5b6472;
+  --border: #e2e5ea;
+  --page-bg: #fbfbfc;
+  --sidebar-bg: var(--page-bg);
+  --sidebar-border: var(--border);
+
+  /* One deliberate accent -- a financial-ledger blue, solid (no gradients). */
+  --accent: #2954a3;
+  --accent-hover: #1f3f80;
+  --accent-soft: #eaf0f9;
+
+  --danger: #b3261e;
+  --danger-hover: #922019;
+  --danger-soft: #fbeceb;
 }
 
 @theme inline {
@@ -12,15 +27,8 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
