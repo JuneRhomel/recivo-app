@@ -139,6 +139,7 @@ export function ReceiptsPage() {
         <ReceiptForm
           key={editing?.id ?? "new"}
           editing={editing}
+          receipts={receipts}
           onSubmit={handleSubmit}
           onCancel={closeForm}
         />

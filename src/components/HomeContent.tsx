@@ -10,6 +10,7 @@ import { RecentReceiptsWidget } from "@/components/dashboard/RecentReceiptsWidge
 import { SpendByTypeWidget } from "@/components/dashboard/SpendByTypeWidget";
 import { buttonClasses } from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
+import { useMonthlyTarget } from "@/hooks/useMonthlyTarget";
 import { useReceipts } from "@/hooks/useReceipts";
 import { ROUTES } from "@/router/routes";
 import { formatPeriodLabel, getCurrentPeriodMonth, getPeriodMonth } from "@/utils/period";
@@ -17,6 +18,8 @@ import { formatPeriodLabel, getCurrentPeriodMonth, getPeriodMonth } from "@/util
 export function HomeContent() {
   const { user, loading: authLoading } = useAuth();
   const { receipts, loading: receiptsLoading } = useReceipts();
+  const month = getCurrentPeriodMonth();
+  const { target, setTarget } = useMonthlyTarget(month);
 
   if (authLoading) {
     return (
@@ -47,7 +50,6 @@ export function HomeContent() {
       );
     }
 
-    const month = getCurrentPeriodMonth();
     const periodReceipts = receipts.filter((r) => getPeriodMonth(new Date(r.date)) === month);
     const periodTotal = periodReceipts.reduce((sum, r) => sum + r.payment, 0);
 
@@ -75,6 +77,8 @@ export function HomeContent() {
             periodLabel={formatPeriodLabel(month)}
             total={periodTotal}
             count={periodReceipts.length}
+            target={target}
+            onTargetChange={setTarget}
           />
           <QuickActionsWidget month={month} />
           <div className="flex flex-col gap-4 md:grid md:grid-cols-2">

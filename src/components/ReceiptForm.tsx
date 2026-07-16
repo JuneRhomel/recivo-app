@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { uploadReceiptImage } from "@/api/receipts";
 import type { ExpenseType, Receipt, ReceiptInput } from "@/api/receipts";
 import { EXPENSE_TYPES } from "@/api/receipts";
@@ -23,11 +23,12 @@ const EMPTY_FORM = {
 
 interface ReceiptFormProps {
   editing: Receipt | null;
+  receipts: Receipt[];
   onSubmit: (input: ReceiptInput) => Promise<{ ok: boolean; error?: string }>;
   onCancel: () => void;
 }
 
-export function ReceiptForm({ editing, onSubmit, onCancel }: ReceiptFormProps) {
+export function ReceiptForm({ editing, receipts, onSubmit, onCancel }: ReceiptFormProps) {
   const [form, setForm] = useState(() =>
     editing
       ? {
@@ -51,6 +52,39 @@ export function ReceiptForm({ editing, onSubmit, onCancel }: ReceiptFormProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(editing?.imageUrl ?? null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const { accessToken } = useAuth();
+
+  // Latest known details per company, so picking a known name refills
+  // everything except date/gross/image. Later receipts win on ties.
+  const companyDirectory = useMemo(() => {
+    const map = new Map<
+      string,
+      { companyName: string; address: string; tinNumber: string; type: ExpenseType; wtaxRate: number }
+    >();
+    for (const r of [...receipts].sort((a, b) => a.date.localeCompare(b.date))) {
+      map.set(r.companyName.toLowerCase(), {
+        companyName: r.companyName,
+        address: r.address,
+        tinNumber: r.tinNumber,
+        type: r.type,
+        wtaxRate: r.wtaxRate,
+      });
+    }
+    return map;
+  }, [receipts]);
+
+  const handleCompanyNameChange = (value: string) => {
+    const known = companyDirectory.get(value.toLowerCase());
+    setForm((prev) => ({
+      ...prev,
+      companyName: value,
+      ...(known && {
+        address: known.address,
+        tinNumber: known.tinNumber,
+        type: known.type,
+        wtaxRate: String(known.wtaxRate),
+      }),
+    }));
+  };
 
   const gross = Number(form.gross);
   const wtaxRate = Number(form.wtaxRate);
@@ -122,9 +156,15 @@ export function ReceiptForm({ editing, onSubmit, onCancel }: ReceiptFormProps) {
           Company Name
           <Input
             required
+            list="company-names"
             value={form.companyName}
-            onChange={(e) => setForm({ ...form, companyName: e.target.value })}
+            onChange={(e) => handleCompanyNameChange(e.target.value)}
           />
+          <datalist id="company-names">
+            {[...companyDirectory.values()].map((c) => (
+              <option key={c.companyName} value={c.companyName} />
+            ))}
+          </datalist>
         </label>
         <label className="flex flex-col gap-1.5 text-xs font-medium tracking-wide text-(--muted) uppercase">
           Address

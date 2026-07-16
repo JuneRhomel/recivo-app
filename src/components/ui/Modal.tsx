@@ -30,7 +30,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
       onClick={onClose}
     >
       <Card
-        className={cn("w-full max-w-sm p-6", className)}
+        className={cn("w-full max-w-sm max-h-[90vh] overflow-y-auto p-6", className)}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"

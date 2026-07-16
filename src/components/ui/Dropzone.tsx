@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Upload, X } from "lucide-react";
+import { Camera, Loader2, Upload, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { cn } from "@/utils/cn";
 
@@ -14,6 +14,7 @@ interface DropzoneProps {
 export function Dropzone({ previewUrl, uploading, onFileSelected, onRemove }: DropzoneProps) {
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = (files: FileList | null) => {
     const file = files?.[0];
@@ -47,10 +48,18 @@ export function Dropzone({ previewUrl, uploading, onFileSelected, onRemove }: Dr
         className="hidden"
         onChange={(e) => handleFiles(e.target.files)}
       />
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={(e) => handleFiles(e.target.files)}
+      />
 
       {previewUrl ? (
         <>
-          {/* eslint-disable-next-line @next/next/no-img-element -- external MinIO/S3 URL, not a static app asset */}
+          {/* eslint-disable-next-line @next/next/no-img-element -- external Google Drive URL, not a static app asset */}
           <img
             src={previewUrl}
             alt="Receipt preview"
@@ -70,10 +79,23 @@ export function Dropzone({ previewUrl, uploading, onFileSelected, onRemove }: Dr
         </>
       ) : (
         <>
-          <Upload size={20} className="text-(--muted)" />
-          <p className="px-4 text-center text-xs text-(--muted)">
-            Drag and drop an image, or click to browse
-          </p>
+          <div className="hidden flex-col items-center gap-2 sm:flex">
+            <Upload size={20} className="text-(--muted)" />
+            <p className="px-4 text-center text-xs text-(--muted)">
+              Drag and drop an image, or click to browse
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              cameraInputRef.current?.click();
+            }}
+            className="flex items-center gap-1.5 rounded-md border border-(--border) px-2.5 py-1 text-xs text-(--muted) hover:bg-black/4 sm:hidden"
+          >
+            <Camera size={14} />
+            Use camera
+          </button>
         </>
       )}
 
