@@ -40,7 +40,7 @@ export interface ReceiptInput {
 }
 
 export type ImageUploadResult =
-  | { ok: true; imageUrl: string }
+  | { ok: true; key: string; previewUrl: string }
   | { ok: false; status: number; error: string };
 
 export type ReceiptResult =
@@ -127,7 +127,7 @@ export async function uploadReceiptImage(
       return { ok: false, status: res.status, error: await parseError(res) };
     }
     const data = await res.json();
-    return { ok: true, imageUrl: data.imageUrl };
+    return { ok: true, key: data.key, previewUrl: data.previewUrl };
   } catch {
     return { ok: false, status: 0, error: "Could not reach the server. Please try again." };
   }

@@ -43,7 +43,12 @@ export function ReceiptForm({ editing, onSubmit, onCancel }: ReceiptFormProps) {
   );
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(editing?.imageUrl ?? null);
+  // imageKey is only set when a NEW image is uploaded this session -- it's
+  // the value actually submitted. previewUrl is display-only (a presigned
+  // URL, whether from an existing receipt's GET response or a fresh upload)
+  // and is never sent back to the API.
+  const [imageKey, setImageKey] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(editing?.imageUrl ?? null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const { accessToken } = useAuth();
 
@@ -59,7 +64,8 @@ export function ReceiptForm({ editing, onSubmit, onCancel }: ReceiptFormProps) {
     const result = await uploadReceiptImage(accessToken, file);
     setUploadingImage(false);
     if (result.ok) {
-      setImageUrl(result.imageUrl);
+      setImageKey(result.key);
+      setPreviewUrl(result.previewUrl);
     } else {
       setError(result.error);
     }
@@ -77,7 +83,7 @@ export function ReceiptForm({ editing, onSubmit, onCancel }: ReceiptFormProps) {
       tinNumber: form.tinNumber,
       gross,
       wtaxRate,
-      imageUrl: imageUrl ?? undefined,
+      imageUrl: imageKey ?? undefined,
     });
     setSubmitting(false);
     if (!result.ok) {
@@ -165,10 +171,13 @@ export function ReceiptForm({ editing, onSubmit, onCancel }: ReceiptFormProps) {
       <label className="flex flex-col gap-1.5 text-xs font-medium tracking-wide text-(--muted) uppercase">
         Receipt image
         <Dropzone
-          previewUrl={imageUrl}
+          previewUrl={previewUrl}
           uploading={uploadingImage}
           onFileSelected={handleFileSelected}
-          onRemove={() => setImageUrl(null)}
+          onRemove={() => {
+            setImageKey(null);
+            setPreviewUrl(null);
+          }}
         />
       </label>
 
