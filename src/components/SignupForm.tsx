@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useCallback, useState } from "react";
 import { signupWithGoogle } from "@/api/auth";
-import { useGoogleSignIn } from "@/hooks/useGoogleSignIn";
 import { ROUTES } from "@/router/routes";
 import { AuthCard } from "./AuthCard";
 import { GoogleSignInButton } from "./GoogleSignInButton";
@@ -26,8 +25,6 @@ export function SignupForm() {
     );
   }, []);
 
-  useGoogleSignIn(handleCredential);
-
   if (success) {
     return (
       <AuthCard title="Account created">
@@ -43,7 +40,7 @@ export function SignupForm() {
 
   return (
     <AuthCard title="Create your Recivo account">
-      <GoogleSignInButton />
+      <GoogleSignInButton onCredential={handleCredential} />
       {error && <p className="text-center text-sm text-(--danger)">{error}</p>}
       <Link href={ROUTES.LOGIN} className="text-sm text-(--accent) underline">
         Already have an account? Log in

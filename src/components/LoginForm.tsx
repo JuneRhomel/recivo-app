@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useGoogleSignIn } from "@/hooks/useGoogleSignIn";
 import { ROUTES } from "@/router/routes";
 import { AuthCard } from "./AuthCard";
 import { GoogleSignInButton } from "./GoogleSignInButton";
@@ -27,11 +26,9 @@ export function LoginForm() {
     [login, router]
   );
 
-  useGoogleSignIn(handleCredential);
-
   return (
     <AuthCard title="Log in to Recivo">
-      <GoogleSignInButton />
+      <GoogleSignInButton onCredential={handleCredential} />
       {error && <p className="text-center text-sm text-(--danger)">{error}</p>}
       <Link href={ROUTES.SIGNUP} className="text-sm text-(--accent) underline">
         Need an account? Sign up
