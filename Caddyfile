@@ -1,0 +1,21 @@
+{
+	admin off
+	# Railway terminates TLS at its edge and proxies plain HTTP to the container.
+	auto_https off
+}
+
+:{$PORT:3000} {
+	root * /srv
+	encode gzip
+
+	# next.config.ts sets trailingSlash: true, so every route is exported as
+	# <route>/index.html. file_server serves that for "/route/" on its own and
+	# redirects "/route" -> "/route/" -- the same shape cf-index-rewrite.js
+	# hand-rolled for CloudFront.
+	file_server
+
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
+}
