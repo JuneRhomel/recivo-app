@@ -16,6 +16,10 @@
     "react-loading-skeleton": "^3.5.0",
     "tailwind-merge": "^3.6.0"
   },
+  "// overrides": "fdir declares picomatch ^3 || ^4 as an optional peer while micromatch pins the hoisted copy to 2.3.2. npm resolves that clash inconsistently -- it passed locally but failed `npm ci` in the Docker build. Collapsing every consumer onto one picomatch version leaves nothing to resolve differently. Only the lint toolchain (eslint-config-next) pulls picomatch in; `next build` does not touch it.",
+  "overrides": {
+    "picomatch": "^4.0.5"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
